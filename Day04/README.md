@@ -1,6 +1,6 @@
 # Kubernetes
 
-##Why we need Kuberntes
+## Why we need Kuberntes
 
 Using standalone containers can provide flexibility and simplicity for deploying applications, but there are several challenges associated with their use. Here are some of the key challenges:
 
