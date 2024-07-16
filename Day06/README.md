@@ -25,12 +25,16 @@ The configuration file will contain the desired setup state of our cluster for e
 the config.yaml file looks as follows:
 
 <pre>
+```
+```
 kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
 nodes:
   - role: control-plane
   - role: worker
   - role: worker
+```
+``` 
 </pre>
 
 `kind create cluster --image kindest/node:v1.30.0@sha256:047357ac0cfea04663786a612ba1eaba9702bef25227a794b52890dd8bcd692e --name cka1-cluster2 --config confnode:v1.30.0@sha256:047357ac0cfea04663786a612ba1eaba9702bef25227a794b52890dd8bcd692e --name day06-cluster2 --config config.yaml`
