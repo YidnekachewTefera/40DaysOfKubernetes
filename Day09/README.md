@@ -277,3 +277,4 @@ This label selector indicates that the Service will route traffic to all pods th
 `kubectl get services`
 ![alt text](image-6.png)
 as you can see from the image the load balancer is pending for an external ip that is going to be provided by Cloud providers.
+Thank you very much !~!~!~
