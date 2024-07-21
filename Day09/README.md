@@ -6,6 +6,9 @@ The idea of a Service is to group a set of Pod endpoints into a single resource.
 
 A Service identifies its member Pods with a selector. For a Pod to be a member of the Service, the Pod must have all of the labels specified in the selector.
 
+It make the pods to be lossely coupled, ensures they are running on specific port and it
+provides a communication between the pods
+
 ## Why use a Kubernetes Service?
 
 In a Kubernetes cluster, each Pod has an internal IP address. But the Pods in a Deployment come and go, and their IP addresses change. So it doesn't make sense to use Pod IP addresses directly. With a Service, you get a stable IP address that lasts for the life of the Service, even as the IP addresses of the member Pods change.
@@ -103,3 +106,174 @@ run `kubectl apply -f file-name(nodeport in my case).yaml`
 
 after that try to access nginx by searching on your browser using the following URL `localhost:30001`
 ![alt text](image-1.png)
+
+## Cluster Ip
+
+In Kubernetes, a "ClusterIP" service is the default service type that exposes the service on an internal IP within the cluster. This IP address is only accessible from within the Kubernetes cluster, meaning that it can't be accessed directly from outside the cluster without additional configuration.
+
+Cluster Ip is useful for the following :-
+
+Internal Communication: ClusterIP is mainly used for communication between services within the same cluster. For example, if you have a set of backend microservices that need to communicate with each other, you can expose them using ClusterIP services.
+
+Service Discovery: Kubernetes uses DNS to provide service discovery. Each ClusterIP service gets an internal DNS name, which can be used by other services within the cluster to access it. This makes it easy for different components to find and communicate with each other without needing to know specific IP addresses.
+
+Load Balancing: ClusterIP services also provide basic load balancing within the cluster. When a request is made to the ClusterIP address, Kubernetes can distribute the traffic across all the pods associated with that service, providing a simple way to balance the load.
+
+Isolation and Security: Since ClusterIP services are not accessible from outside the cluster, they provide a level of isolation and security. Only other services within the cluster can access these services, reducing the attack surface and limiting exposure.
+
+Overall, ClusterIP services are a fundamental part of service communication and discovery within a Kubernetes cluster, facilitating internal networking and ensuring that microservices can communicate seamlessly with each other.
+
+### Cluster IP Demonestration
+
+<pre>
+apiVersion: v1
+kind: Service
+metadata:
+  name: cluster-svc
+  labels:
+    env: demoo
+spec:
+  ports:
+    - port: 80
+      targetPort: 80
+  selector:
+    env: demo
+</pre>
+
+The above Kubernetes manifest defines a Service resource. Let's break down the key components of the script:
+
+1. apiVersion: v1
+   This specifies the version of the Kubernetes API that you're using. For a Service resource, the API version v1 is typically used.
+2. kind: Service
+   This specifies that the resource being defined is a Kubernetes Service.
+3. metadata
+   This section includes metadata about the Service, such as its name and labels.
+
+name: cluster-svc
+
+This is the name of the Service. It's a unique identifier for the Service within the namespace.
+labels
+
+This is a key-value pair used to organize and select resources. In this case, the label env: demoo is assigned to the Service. 4. spec
+This section defines the specifications of the Service, including how it should route traffic.
+
+ports
+
+This defines the ports that the Service will expose. It's an array, so you can define multiple ports if needed.
+
+port: 80
+
+This is the port number on which the Service will be exposed. Clients can connect to this port to access the service.
+targetPort: 80
+
+This specifies the port on the pod to which the traffic should be forwarded. It can be a different port number than the exposed port, but in this case, it's the same (80).
+selector
+
+This field defines how Kubernetes will know which pods the Service should route traffic to. It uses labels for this purpose.
+
+env: demo
+
+This label selector means that the Service will route traffic to pods with the label env: demo.
+run the following command and create the service type of Cluster Ip
+`kubectl apply -f file_name.yaml`
+![alt text](image-2.png)
+
+`kubectl get services`
+![alt text](image-3.png)
+
+we have successfuly created a kubernetes service with type of Cluster IP
+
+## LoadBalancer
+
+LoadBalancer is a type of service that allows you to expose your application to the internet.
+A LoadBalancer service in Kubernetes is used to expose a service to external clients, making it accessible outside the Kubernetes cluster. This service type integrates with external load balancers, typically provided by cloud service providers, to distribute incoming network traffic across multiple pods or instances of an application.
+
+Key Features and Uses of LoadBalancer Service:
+External Access:
+
+The primary use of a LoadBalancer service is to make an application accessible from outside the Kubernetes cluster. When a LoadBalancer service is created, it provisions an external IP address that external clients can use to access the service.
+Automatic Load Balancing:
+
+The LoadBalancer service automatically distributes incoming traffic across all healthy pods that match the service's selector. This helps to balance the load and improve the availability and reliability of the application.
+Integration with Cloud Providers:
+
+In cloud environments (like AWS, Google Cloud, Azure), creating a LoadBalancer service in Kubernetes triggers the cloud provider's load balancing infrastructure. For example, in AWS, an Elastic Load Balancer (ELB) may be provisioned, while in Google Cloud, a Google Cloud Load Balancer could be set up.
+Service Port Mapping:
+
+The LoadBalancer service can map an external port to a target port on the pods, allowing flexible configuration of how the service is exposed. For example, you could expose your application on port 80 externally while the application itself listens on a different port internally.
+TLS/SSL Termination:
+
+Many cloud provider load balancers support TLS/SSL termination, which means they can handle SSL/TLS encryption, offloading this work from your application. This is useful for securing HTTP traffic.
+Health Checks and Monitoring:
+
+Cloud load balancers often provide built-in health checks, monitoring the health of the pods or instances behind them. If a pod becomes unhealthy, the load balancer can stop sending traffic to it until it recovers.
+Common Use Cases:
+Exposing Web Applications:
+
+LoadBalancer services are commonly used to expose web applications (e.g., websites, APIs) to the internet. This allows users or clients to access the application from anywhere.
+Providing Public Access to Services:
+
+They are used when you want to provide public access to services that need to be reached by users or other services outside the Kubernetes cluster.
+Handling Large Traffic Loads:
+
+LoadBalancer services are beneficial for applications that need to handle a significant amount of traffic, as they distribute the load across multiple pods, improving scalability and fault tolerance.
+
+### LoadBalancer Demonestration
+
+<pre>
+apiVersion: v1
+kind: Service
+metadata:
+  name: load-balancer
+  labels:
+    env: demo
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 80
+  selector:
+    env: demo
+
+</pre>
+
+This Kubernetes manifest defines a Service resource of type LoadBalancer. Let's break down each section:
+
+1. apiVersion: v1
+   This specifies the version of the Kubernetes API that is being used. For a Service resource, v1 is the correct version.
+2. kind: Service
+   This indicates that the resource being defined is a Kubernetes Service.
+3. metadata
+   This section includes metadata about the Service, such as its name and labels.
+
+name: load-balancer
+
+This is the name of the Service. It uniquely identifies the Service within the namespace.
+labels
+
+Labels are key-value pairs used to categorize and identify resources. In this case, the label env: demo is associated with the Service. 4. spec
+This section defines the specifications and behavior of the Service.
+
+type: LoadBalancer
+
+This specifies that the Service type is LoadBalancer. This means the Service will provision an external load balancer, which typically provides a public IP address to expose the service externally.
+ports
+
+This defines the ports that the Service will expose. It's an array, so you can define multiple ports if needed.
+
+port: 80
+
+This is the port number on which the Service will be exposed. External clients will use this port to access the Service.
+selector
+
+This defines how Kubernetes will determine which pods the Service routes traffic to. It uses labels to match the Service with the correct pods.
+
+env: demo
+
+This label selector indicates that the Service will route traffic to all pods that have the label env: demo.
+
+`kubectl apply -f file-name.yaml`
+
+![alt text](image-4.png)
+`kubectl get services`
+![alt text](image-6.png)
+as you can see from the image the load balancer is pending for an external ip that is going to be provided by Cloud providers.
