@@ -278,3 +278,19 @@ This label selector indicates that the Service will route traffic to all pods th
 ![alt text](image-6.png)
 as you can see from the image the load balancer is pending for an external ip that is going to be provided by Cloud providers.
 Thank you very much !~!~!~
+
+# Tasks solutions screenshots
+
+![alt text](image-7.png)
+![alt text](image-8.png)
+![alt text](image-9.png)
+
+## Exposing a Pods as a Service without Deployment
+
+Exposing a pods as a service without deployment is possible, but it's generally not recommended for production environments. The reasons for these are:
+
+1. Pod's Lifecycle: the pods that are running may fail so at this time we can't restart another instance automatically
+2. Scalability: the pods can't be added or removed based on demand, these results in performance issues and under-utilization of resources
+3. High Availability: we don't have a guarantee for our service to be available for the required time.
+4. LoadBalancing: the traffic requests can't be distributed accross pods based on the traffic they are handling.
+5. Manual management: these kind of service requires manual intervention.
